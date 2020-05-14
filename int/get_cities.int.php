@@ -9,19 +9,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $return = [];
 
   //grabbing info from $_POST and filtering them
-  include "add_user_insert.int.php";
+  $stateID = (int)$_POST["state"];
 
-  //add user to DB
-  if (!$success) {
-    //checks to see if there was already an error reported
-    if ($return['error'] == '') {
-      $return['error'] = "Error 152DB no se creo el registro. Reportar al ADMIN!";
-    }
+  //searches DB for state
+  $cities = DBX::GetCitiesByStateID($stateID);
+  //$cities = array_reverse($cities);
+  if (!$cities) {
+    //if there are cities
+    $return['cities'] = false;
   } else {
-    $return['redirect'] = 'add_user_form.php?message=success!';
+    $return['cities'] = $cities;
   }
-
-
 
   //information gets send back to ajax
   echo json_encode($return, JSON_PRETTY_PRINT);
@@ -30,5 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   // if they didnt arrived to the page by the POST method it kills script
   exit('Invalid URL');
 }
+
 //$return['redirect'] = 'dashboard.php?message='.$len[33].'!&tab=mu'
 ?>

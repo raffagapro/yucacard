@@ -20,9 +20,15 @@
     //force user to dashboard
     static function ForceDashboard(){
       if (isset($_SESSION['user_id'])) {
-        // The user is allowed get redirect to DASHBOARD
-        header("Location: add_user_form.php");
-        exit;
+        if ($_SESSION['access'] == 0) {
+          // The user is allowed get redirect to DASHBOARD
+          header("Location: admin_panel.php");
+          exit;
+        }else {
+          // The user is allowed get redirect to DASHBOARD
+          header("Location: dashboard.php");
+          exit;
+        }
       }
     }
 

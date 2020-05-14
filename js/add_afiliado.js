@@ -1,12 +1,72 @@
 $(document).ready(function() {
 
+  //function for changing city options when changin this.state
+  $("#state").on("change", function(){
+
+    //grab state id and gets list of cities
+    var dataObj = {
+      state: $("#state option:selected").attr('value')
+    };
+
+    //corre AJAX
+    $.ajax({
+      url: 'int/get_cities.int.php',
+      type: 'POST',
+      dataType: 'json',
+      data: dataObj,
+      async: true
+    })
+    .done(function(data) {
+      //checks to see if there was a VALIDATION error
+      if (!data.cities) {
+        $("#city").empty().append(
+          "<option value='z'>No Cities</option>"
+          );
+      } else {
+        $("#city").empty();
+        $("#city").append("<option value='z'>Select City</option>");
+        for (var i = 0; i < data.cities.length; i++) {
+          //ignores city 0, no city
+          if (data.cities[i][0] != 0) {
+            $("#city").append(
+              "<option value='"+ data.cities[i][0] +"' class='text-capitalize'>"+ data.cities[i][1] + "</option>"
+            );
+          }
+        }
+      }
+      //console.log("success");
+    })
+    .fail(function(e) {
+      //console.log("error");
+      //console.log(e.responseText);
+    })
+    .always(function(data) {
+      //console.log(dataObj);
+      //console.log(data);
+    });
+  });
+
+
   //function for subbmiting the form
   $("#submitButton").click(function(event) {
     //prevent de button to submit ormallly
     event.preventDefault();
 
+    //check to if the city was input manually
+    var tempCity = $("input[name='other']").val().toLowerCase()
+    var manualCity = true;
+    if (tempCity == "") {
+      tempCity = $("#city option:selected").attr('value');
+      manualCity = false;
+    }
+
     //creates object to be pass to ajax
     var dataObj = {
+      company_name: $("input[name='nombre_company']").val().toLowerCase(),
+      state: $("#state option:selected").attr('value'),
+      city: tempCity,
+      manualCity: manualCity,
+      job_title: $("input[name='puesto']").val().toLowerCase(),
       name: $("input[name='nombre']").val().toLowerCase(),
       name2: $("input[name='apellido1']").val().toLowerCase(),
       name3: $("input[name='apellido2']").val().toLowerCase(),
@@ -17,12 +77,20 @@ $(document).ready(function() {
     };
 
     //Validation
-    if (dataObj.name == "") {
+    if (dataObj.company_name == "") {
+      sendError("Company Name missing!");
+    } else if (dataObj.state == "z") {
+      sendError("Select a State!");
+    }else if (dataObj.city == "z") {
+      sendError("Select a City!");
+    }else if (dataObj.name == "") {
       sendError("Name missing!");
-    } else if (dataObj.name2 == "") {
+    }else if (dataObj.name2 == "") {
       sendError("Last Name missing!");
     } else if (dataObj.name3 == "") {
       sendError("Second Last Name missing!");
+    } else if (dataObj.job_title == "") {
+      sendError("Job Title missing!");
     } else if (dataObj.phone == "") {
       sendError("Phone missing!");
     } else if (Number.isNaN(parsedPhone = parseInt(dataObj.phone))) {
@@ -40,7 +108,7 @@ $(document).ready(function() {
     } else {
       //si la validacion JS no falla corre AJAX
       $.ajax({
-        url: 'int/add_user.int.php',
+        url: 'int/add_afiliado.int.php',
         type: 'POST',
         dataType: 'json',
         data: dataObj,
@@ -54,15 +122,15 @@ $(document).ready(function() {
           $("#errorMessage").empty().addClass('hidden');
           window.location = data.redirect;
         }
-        console.log("success");
+        //console.log("success");
       })
       .fail(function(e) {
-        console.log("error");
-        console.log(e.responseText);
+        //console.log("error");
+        //console.log(e.responseText);
       })
       .always(function(data) {
-        console.log(dataObj);
-        console.log(data);
+        //console.log(dataObj);
+        //console.log(data);
       });
     }
 

@@ -1,73 +1,94 @@
 $(document).ready(function() {
 
   //function for subbmiting the form
-  $("#submitButton").click(function(event) {
+  $("#submit_buy_gift_btn").click(function(event) {
     //prevent de button to submit ormallly
     event.preventDefault();
 
     //creates object to be pass to ajax
     var dataObj = {
-      name: $("input[name='nombre']").val().toLowerCase(),
-      name2: $("input[name='apellido1']").val().toLowerCase(),
-      name3: $("input[name='apellido2']").val().toLowerCase(),
-      phone: phoneCleaner($("input[name='phone']").val()),
-      email: $("input[name='email']").val(),
-      pw: $("input[name='password']").val(),
-      pw2: $("input[name='password2']").val()
+      buyer_name: $("input[name='nombre_buyer']").val().toLowerCase(),
+      buyer_name2: $("input[name='apellido1_buyer']").val().toLowerCase(),
+      buyer_name3: $("input[name='apellido2_buyer']").val().toLowerCase(),
+      buyer_phone: phoneCleaner($("input[name='phone_buyer']").val()),
+      buyer_email: $("input[name='email_buyer']").val(),
+      price: $("#product_price option:selected").attr('value'),
+      gift_name: $("input[name='nombre_gift']").val().toLowerCase(),
+      gift_name2: $("input[name='apellido1_gift']").val().toLowerCase(),
+      gift_name3: $("input[name='apellido2_gift']").val().toLowerCase(),
+      gift_email: $("input[name='email_gift']").val(),
+      gift_note: $("#gift_note").val()
     };
 
     //Validation
-    if (dataObj.name1 == "") {
+    //for gift info validation purpuses
+    var gift_info = true;
+
+    if (dataObj.buyer_name == "") {
       sendError("Name missing!");
-    } else if (dataObj.name2 == "") {
+    } else if (dataObj.buyer_name2 == "") {
       sendError("Last Name missing!");
-    } else if (dataObj.name3 == "") {
+    } else if (dataObj.buyer_name3 == "") {
       sendError("Second Last Name missing!");
-    } else if (dataObj.phone == "") {
+    } else if (dataObj.buyer_phone == "") {
       sendError("Phone missing!");
-    } else if (Number.isNaN(parsedPhone = parseInt(dataObj.phone))) {
+    } else if (Number.isNaN(parsedPhone = parseInt(dataObj.buyer_phone))) {
       sendError("Phone can only contain letters");
-    }else if (dataObj.email == "") {
+    }else if (dataObj.buyer_email == "") {
       sendError("Email missing!");
-    } else if (isValidEmailAddress(dataObj.email) == false) {
+    } else if (isValidEmailAddress(dataObj.buyer_email) == false) {
       sendError("Invalid email format!");
-    } else if (dataObj.pw == "") {
-      sendError("Password missing!");
-    } else if (dataObj.pw.length < 1) {
-      sendError("Password must be 8 characters or more!");
-    }else if (dataObj.pw != dataObj.pw2) {
-      sendError("Passwords did not match!");
+    } else if (dataObj.price == "z") {
+      sendError("You need to select a price!");
     } else {
-      //si la validacion JS no falla corre AJAX
-      $.ajax({
-        url: 'int/add_user.int.php',
-        type: 'POST',
-        dataType: 'json',
-        data: dataObj,
-        async: true
-      })
-      .done(function(data) {
-        //checks to see if there was a VALIDATION error
-        if (data.error != undefined) {
-          sendError(data.error);
-        }else {
-          $("#errorMessage").empty().addClass('hidden');
-          window.location = data.redirect;
+      //checks to see if giftCard is a gift
+      if (dataObj.gift_name != "") {
+        if (dataObj.gift_name2 == "") {
+          sendError("Recipient Last Name missing!");
+          gift_info = false;
+        } else if (dataObj.gift_name3 == "") {
+          sendError("Recipient Last Name2 missing!");
+          gift_info = false;
+        } else if (dataObj.gift_email == "") {
+          sendError("Recipient Email missing!");
+          gift_info = false;
+        } else if (isValidEmailAddress(dataObj.gift_email) == false) {
+          sendError("Invalid Recipient email format!");
+          gift_info = false;
         }
-        console.log("success");
-      })
-      .fail(function(e) {
-        console.log("error");
-        console.log(e.responseText);
-      })
-      .always(function(data) {
-        console.log(dataObj);
-        console.log(data);
-      });
+      }
+      //checks to see if there was any errors with gift user info
+      if (!gift_info) {
+        //leave empty erro was already passed in validation
+      } else {
+        //si la validacion JS no falla corre AJAX
+        $.ajax({
+          url: 'int/buy_giftCard.int.php',
+          type: 'POST',
+          dataType: 'json',
+          data: dataObj,
+          async: true
+        })
+        .done(function(data) {
+          //checks to see if there was a VALIDATION error
+          if (data.error != undefined) {
+            sendError(data.error);
+          }else {
+            $("#errorMessage").empty().addClass('hidden');
+            window.location = data.redirect;
+          }
+          //console.log("success");
+        })
+        .fail(function(e) {
+          //console.log("error");
+          //console.log(e.responseText);
+        })
+        .always(function(data) {
+          //console.log(dataObj);
+          //console.log(data);
+        });
+      }
     }
-
-
-
   });
 
   //function for formating phone as they type

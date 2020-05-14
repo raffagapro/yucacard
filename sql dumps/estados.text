@@ -33,11 +33,33 @@ VALUES
   ('yucatan'),
   ('zacatecas');
 
+INSERT INTO ciudades(nombre, estado)
+VALUES
+	('no city', 31);
+
+INSERT INTO users (nombre, apellido1, apellido2, email, telefono, access_level, password)
+VALUES
+	('admin', 'system', 'system', 'admin@system.com', '0000000000', 0, '$2y$10$ZIHL.N/8OxDt2/9cXqHMK.Pd2IR0SL7auQeaZ7Yv5/SXwZ6Z7oxIC');
+
 INSERT INTO precios(costo)
 VALUES
 	(50),
   (100),
   (150);
 
+INSERT INTO hotel_categoria(nombre)
+VALUES
+	('hotel boutique'),
+  ('hotel independiente'),
+  ('hotel de cadena');
+
+
+**********************************************************
+estados de follow up
+0 - General (info)
+1 - Sistema (secondary)
+2 - Pagos (success)
+3 - Cancelaciones (danger)
+4 - Importante	(warning)
 
 residencial Villa Magna Calle Alejandría Casa #18

@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   //heck to see if we got a match
   if ($resultArray > 0) {
     //redirect to reedeem page
-    $return['redirect'] = 'add_user_form.php';
+    $return['redirect'] = 'dashboard.php';
   }else {
     $return['error'] = "Gift Card not found or incorrect email!";
   }

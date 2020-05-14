@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $pw = $_POST["pw"];
 
   //checks to see if email already exists
-  //checks to see if email already exists
   $userFound = DBX::GetUSERbyEmail($email);
 
   //heck to see if we got a match
@@ -23,9 +22,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       //save uder id and access level to SESSION ETC
       $_SESSION['user_id'] = $userFound["user_id"];
       $_SESSION['access'] = $userFound["access_level"];
-      //redirect to new page
-      $return['redirect'] = 'add_user_form.php';
-
+      //checks to see if there is an affilated ID
+      $affFound = DBX::GetAffByUserID($_SESSION['user_id']);
+      if ($affFound) {
+        $_SESSION['aff_id'] = $affFound["affi_id"];
+      }
+      //redirect to dashboard or admin panel
+      if ($_SESSION['access'] == 0) {
+        $return['redirect'] = 'admin_panel.php';
+      } else {
+        $return['redirect'] = 'dashboard.php';
+      }
     } else {
       $return['error'] = "Password incorrect!";
     }

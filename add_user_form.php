@@ -2,6 +2,7 @@
 //-----codigo essencial para que la pagiona de log in ------//
 require_once 'includes/header.inc.php';
 Page::ForceLogin();
+//ADDD SECURITY LEVEL RESTRICTION FOR ADMIN ONLY
 //-----codigo essencial para que la pagiona de log in ------//
 ?>
 
@@ -43,8 +44,13 @@ Page::ForceLogin();
       <?php
         $lol = DBX::GetUSERbyName("camila");
         //print_r($lol);
-        $fullName = ucfirst($lol['nombre']) . " " . ucfirst($lol['apellido1']) . " " . ucfirst($lol['apellido2']);
-        echo "Your name is " . $fullName;
+        if ($lol) {
+          $fullName = ucfirst($lol['nombre']) . " " . ucfirst($lol['apellido1']) . " " . ucfirst($lol['apellido2']);
+          echo "Your name is " . $fullName;
+        } else {
+          echo "no se encontro ni madres";
+        }
+
       ?>
     </div>
 

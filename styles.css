@@ -8,6 +8,10 @@ body {
   padding: 10% 35% 5%;
 }
 
+.dash-form{
+  padding: 0% 15%;
+}
+
 .form-signin .form-control {
   position: relative;
   box-sizing: border-box;
@@ -38,6 +42,41 @@ body {
   width: 50%;
 }
 
+.page_icon{
+  border-radius: 100%;
+  width: 8%;
+}
+
+.cus_header{
+  margin: 2% 3%;
+}
+
+.cus_title{
+  padding-left: 25px;
+}
+
+.table_cust{
+  margin-bottom: 0;
+}
+
+.dash_main_body{
+  padding: 0;
+}
+
+.aff_name_status_badge{
+  font-size: 1rem;
+}
+
+.image_slider{
+  height: 100px;
+  width: auto;
+}
+
+.image_single_modal{
+  height: 250px;
+  width: auto;
+}
+
 .lightdanger{
   background-color: #e6b2c6;
 }
@@ -46,4 +85,36 @@ body {
 /*ESTILOS NECESARIOS PARA LA APP*/
 .hidden{
   display: none;
+}
+
+.jumbo-admin{
+  margin-bottom: 0;
+}
+
+.admin_cont{
+  padding: 2% 1%;
+}
+
+.seguimientos{
+  padding: 1%;
+}
+.admin_sub_nav_bar{
+  padding-right: 5%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.admin_sub_nav_bar button{
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.filter_bar_btn{
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+
+.follow_up_test{
+  padding: 0 5px;
+  width: 100%;
+  margin-bottom: 5px;
 }
