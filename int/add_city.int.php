@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $return['error'] = ucfirst($city)." is already in the DB!";
   } else {
     DBX::AddCity($stateID, $city);
-    $return['redirect'] = 'add_city_form.php?message=success!';
+    $return['redirect'] = 'admin_panel.php?tab=affi&message=success!';
   }
 
   //information gets send back to ajax

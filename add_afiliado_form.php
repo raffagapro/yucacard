@@ -17,7 +17,6 @@ $states = DBX::GetStates();
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <?php require_once 'includes/tempNavbar.inc.php'; ?>
 
     <form class="container-fluid form-signin" action="add_user.php" method="post">
       <img class="mb-4 main-icon" src="https://avatarfiles.alphacoders.com/200/200276.jpg" alt="">

@@ -22,6 +22,7 @@
   //include files
   include_once "classes/DB.class.php";
   include_once "classes/Page.class.php";
+  //include_once "classes/Admin.class.php";
 
 
 

@@ -11,7 +11,6 @@
           echo '
           <a class="nav-item nav-link" href="admin_panel.php">Admin Panel</a>
           <a class="nav-item nav-link" href="add_user_form.php">Add User</a>
-          <a class="nav-item nav-link" href="add_city_form.php">Add City</a>
           ';
         } else {
           echo '<a class="nav-item nav-link" href="dashboard.php">Dashboard</a>';

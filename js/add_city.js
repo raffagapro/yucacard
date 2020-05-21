@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   //function for subbmiting the form
-  $("#submitButton").click(function(event) {
+  $("#add_city_submit_btn").click(function(event) {
     //prevent de button to submit ormallly
     event.preventDefault();
 

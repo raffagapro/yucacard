@@ -29,6 +29,9 @@ Page::ForceDashboard();
       <div id="errorMessage" class="alert alert-danger hidden" role="alert"></div>
 
       <button class="btn btn-lg btn-primary btn-block" id="submitButton" type="submit">BAT-log Me In!</button>
+      <small>
+        <a href="add_afiliado_form.php">Affiliate Now!</a>
+      </small>
       <p class="mt-5 mb-3 text-muted">&copy; Bat-App 2017-2020</p>
     </form>
 

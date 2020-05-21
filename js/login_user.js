@@ -37,15 +37,15 @@ $(document).ready(function() {
           $("#errorMessage").empty().addClass('hidden');
           window.location = data.redirect;
         }
-        console.log("success");
+        //console.log("success");
       })
       .fail(function(e) {
-        console.log("error");
-        console.log(e.responseText);
+        //console.log("error");
+        //console.log(e.responseText);
       })
       .always(function(data) {
-        console.log(dataObj);
-        console.log(data);
+        //console.log(dataObj);
+        //console.log(data);
       });
     }
 

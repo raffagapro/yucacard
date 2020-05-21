@@ -42,7 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //checks to see if there was an errro
     $return['error'] = "Error 152DB no se creo el registro. Reportar al ADMIN!";
   } else {
-    $return['redirect'] = 'dashboard.php?message=success!';
+    if ($_SESSION['access'] == 0) {
+      $return['redirect'] = 'admin_panel.php?tab=affi&message=success!';
+    }else {
+      $return['redirect'] = 'dashboard.php?message=success!';
+    }
   }
 
   //information gets send back to ajax

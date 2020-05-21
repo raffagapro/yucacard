@@ -113,8 +113,21 @@ body {
   margin-bottom: 30px;
 }
 
+.filter_bar_link{
+  margin-top: 0;
+  margin-bottom: -5px;
+}
+
 .follow_up_test{
   padding: 0 5px;
   width: 100%;
   margin-bottom: 5px;
+}
+
+.q_fix{
+  margin-top: 15px;
+  margin-left: 5px;
+}
+.q_fix_margin_left{
+  margin-left: 5px;
 }

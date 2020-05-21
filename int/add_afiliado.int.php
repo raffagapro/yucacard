@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       if ($affFound) {
         $_SESSION['aff_id'] = $affFound["affi_id"];
       }
-      $return['redirect'] = 'add_product_form.php?message=success!';
+      $return['redirect'] = 'dashboard.php?message=success!';
     }
   }
 

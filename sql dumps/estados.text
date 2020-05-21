@@ -35,7 +35,7 @@ VALUES
 
 INSERT INTO ciudades(nombre, estado)
 VALUES
-	('no city', 31);
+	('noCity', 31);
 
 INSERT INTO users (nombre, apellido1, apellido2, email, telefono, access_level, password)
 VALUES

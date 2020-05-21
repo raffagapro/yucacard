@@ -1,12 +1,14 @@
 <?php
 //-----codigo essencial para que la pagina ------//
 require_once 'includes/header.inc.php';
+include 'int/functions.php';
 Page::ForceLogin();
 $products = DBX::GetProductsByAffID($_SESSION['aff_id']);
 $aff = DBX::GetAffByUserID($_SESSION['user_id']);
 $user = DBX::GetUSERbyID($_SESSION['user_id']);
 $product_categories = DBX::GetProductCategories();
 $precios = DBX::GetPrecios();
+$reservations = DBX::GetAllGiftCard();
 
 //-----codigo essencial para que la pagina ------//
 ?>
@@ -123,7 +125,12 @@ $precios = DBX::GetPrecios();
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
           <a class="nav-link active" id="v-pills-products-tab" data-toggle="pill" href="#v-pills-products" role="tab" aria-controls="v-pills-products" aria-selected="true">Products</a>
           <a class="nav-link" id="v-pills-reservations-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Reservations</a>
-          <a class="nav-link" id="v-pills-addProduct-tab" data-toggle="pill" href="#v-pills-add_new_product" role="tab" aria-controls="v-pills-messages" aria-selected="false">Add New Product</a>
+          <?php
+          //checks to see if the Affiliate has been approved, and it gives them the ability to add products
+          if ($aff['aprovado'] != 0) {
+            echo '<a class="nav-link" id="v-pills-addProduct-tab" data-toggle="pill" href="#v-pills-add_new_product" role="tab" aria-controls="v-pills-messages" aria-selected="false">Add New Product</a>';
+          }
+          ?>
           <!--
 
           <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</a>
@@ -147,13 +154,20 @@ $precios = DBX::GetPrecios();
               and inside there is a card with the full info.
               I had to generate a unique ID for the accordians to work
               --------------------------------------------*/
+              //limist the ability to add products if affiliate is not approved.
               if (!$products) {
+                $preMessage = "";
+                if ($aff['aprovado'] == 0) {
+                  $preMessage = "<p class='lead'>You will be able to ADD PRODUCTS once you have been approved!</p>";
+                }else {
+                  $preMessage = "<p class='lead'>Would you like to add a product?</p>
+                  <button type='button' class='btn btn-outline-primary' id='add_new_product_tab_jumper'>Add New Product!</button>";
+                }
                 echo "
                 <div class='jumbotron jumbotron-fluid'>
                   <div class='container'>
                     <h1 class='display-4'>There are no products!</h1>
-                    <p class='lead'>Would you like to add a product?</p>
-                    <button type='button' class='btn btn-outline-primary' id='add_new_product_tab_jumper'>Add New Product!</button>
+                    ".$preMessage."
                   </div>
                 </div>
                 ";
@@ -422,7 +436,176 @@ $precios = DBX::GetPrecios();
           </div>
 
           <!-- RESERVATIONS -------------------------------------------->
-          <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-reservations-tab">...</div>
+          <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-reservations-tab">
+
+            <!-- Menu de filtros------------------->
+            <div class="text-right bg-dark admin_sub_nav_bar">
+              <button type="button" class="btn btn-info btn-sm filter_bar_btn" data-toggle="modal" data-target="#search_reservation_modal"><i class="fas fa-search"></i></button>
+              <a href="admin_panel.php" class="btn btn-info btn-sm filter_bar_link asc_sort_btn" role="button"><i class="fas fa-sort-amount-up-alt"></i></a>
+              <a href="admin_panel.php" class="btn btn-info btn-sm filter_bar_link desc_sort_btn" role="button"><i class="fas fa-sort-amount-down"></i></a>
+              <a href="" class="btn btn-info btn-sm filter_bar_link clear_filters_btn" role="button"><i class="fas fa-ban"></i></a>
+            </div>
+
+            <!-- Modal SEARCH NAME-->
+            <div class='modal fade' id='search_reservation_modal' tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true'>
+              <div class='modal-dialog' role='document'>
+                <div class='modal-content'>
+                  <div class='modal-header'>
+                    <h5 class='modal-title'>Search Reservations</h5>
+                    <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                      <span aria-hidden='true'>&times;</span>
+                    </button>
+                  </div>
+                  <div class='modal-body'>
+                    <form class='text-center' action='admin_panel.php' method='GET'>
+
+                      <label for='search_name'>Name</label>
+                      <input type='text' class='form-control text-capitalize' name='search_name' value=''>
+                      <label for='search_reservation_number'>Reservation Number</label>
+                      <input type='text' class='form-control text-capitalize' name='search_reservation_number' value=''>
+                      <label for='search_email'>Email</label>
+                      <input type='email' class='form-control' name='search_email' value=''>
+                      <label for='search_date'>Creation Date</label>
+                      <input class='form-control bot' id='litepicker' name='litepicker'>
+                      <input type="hidden" name="search" value="on">
+                      <input type="hidden" name="tab" value="res">
+                      <div id='errorMessageSearch' class='alert alert-danger hidden text-center' role='alert'></div>
+
+
+                      <div class='text-right'>
+                        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Close</button>
+                        <button class='btn btn-primary' id='submitSearchRes' type='submit'>Search</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla de Reservaciones------------------->
+            <table class="table table-hover table-dark">
+              <tbody>
+
+                <!--ITerating portion of RESERVATIONS -------------------------------------------->
+                <?php
+                  //variable for keeping track if we find any reservations
+                  $noRes = 0;
+                  //checks if there all products of the Affiliate against all reservations
+                  foreach ($products as $product) {
+                    $noRes++;
+                    foreach ($reservations as $reservation) {
+                      if ($product[0] == $reservation[17]) {
+                        //if there is even one reservation reset the var to 0
+                        $noRes = 0;
+                        //iterates thru reservations
+                ?>
+
+                <tr>
+                  <th>
+                    <!---TABLE ROW-------------->
+                    <div class="row">
+                      <!---RESERVATION NUMBER--------------------->
+                      <div class="col-3">
+                        <p class="text-uppercase"><?php echo $reservation[1]; ?></p>
+                      </div>
+                      <!---PRODUCT NAME--------------------->
+                      <div class="col-2">
+                      <p class="text-capitalize">
+                        <?php
+                          foreach ($products as $product) {
+                            if ($product[0] == $reservation[17]) {
+                              echo $product[3];
+                            }
+                          }
+                        ?>
+                      </p>
+                      </div>
+                      <!---PRICE--------------------->
+                      <div class="col-2">
+                        $<?php echo price_grabber($reservation[2]); ?>.00 USD
+                      </div>
+                      <!---CREATION DATE--------------------->
+                      <div class="col-2">
+                        <small id="creation_date" class="form-text text-light"><?php echo $reservation[3]; ?></small>
+                      </div>
+                      <!---RESERVATION STATUS--------------------->
+                      <div class="col-1">
+                        <?php
+                        if ($reservation[15] == 1) {
+                          echo "<span class='badge badge-warning'>Pending</span>";
+                        }else {
+                          echo res_status_switcher($reservation[15]);
+                        }
+                        ?>
+                      </div>
+                      <!---BTNS SECTION--------------------->
+                      <div class="col-2">
+                        <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target="#reservation_collapse<?php echo $reservation[0]; ?>">
+                          <i class="fas fa-bars"></i>
+                        </button>
+                        <?php if ($reservation[15] == 1) {?>
+                          <button class="btn btn-info btn-sm" type="button">
+                            <i class="fas fa-check"></i>
+                          </button>
+                        <?php
+                        }
+                        ?>
+                      </div>
+                    </div>
+
+                    <!---COLLAPSE-------------->
+                    <div class="collapse" id="reservation_collapse<?php echo $reservation[0]; ?>">
+                      <!---BUYERS INFO-------------->
+                      <div class="row">
+                        <div class="col-1 text-right"><small>Buyer´s Info</small></div>
+                      </div>
+                      <div class="row">
+                        <div class="col-4 text-capitalize"><?php echo $reservation[4]." ".$reservation[5]." ".$reservation[6]; ?></div>
+                        <div class="col-3"><?php echo $reservation[8]; ?></div>
+                        <div class="col-3"><?php echo $reservation[7]; ?></div>
+                      </div>
+                      <br>
+
+                      <!---BUYERS INFO-------------->
+                      <?php
+                      //if the reservation is a gift card dusplay gift recipient info
+                        if ($reservation[9] == 1) {
+                      ?>
+                      <div class="card bg-info text-dark">
+                        <div class=" card-body row">
+                          <div class="col-1">
+                            <p><span class="badge badge-dark" id="es_gift">Gift</span></p>
+                          </div>
+                          <div class="col-4 text-capitalize text-left"><small><?php echo $reservation[10]." ".$reservation[11]." ".$reservation[12]; ?></small></div>
+                          <div class="col-3 text-left"><small><?php echo $reservation[13]; ?></small></div>
+                          <div class="col-4 text-capitalize text-left"><small><?php echo $reservation[14]; ?></small></div>
+                        </div>
+                      </div>
+                      <?php
+                        }
+                      ?>
+                    </div>
+                  </th>
+                </tr>
+
+                <?php
+                      }
+                    }
+                    //if there was no reservations show jumbotron
+                    if ($noRes == count($products)) {
+                      echo "
+                        <div class='jumbotron jumbotron-fluid bg-secondary text-light'>
+                          <div class='container'>
+                            <h1 class='display-4'>There are no reservations!</h1>
+                        </div>";
+                    }
+                  }
+                ?>
+                <!--ITerating portion of RESERVATIONS -------------------------------------------->
+
+              </tbody>
+            </table>
+          </div>
           <!-- ADD NEW PORODUCT -------------------------------------------->
           <div class="tab-pane fade" id="v-pills-add_new_product" role="tabpanel" aria-labelledby="v-pills-addProduct-tab">
             <div class="jumbotron jumbotron-fluid">
@@ -494,8 +677,6 @@ $precios = DBX::GetPrecios();
               <p class="mt-5 mb-3 text-muted">&copy; The Bat-App 2017-2020</p>
             </form>
           </div>
-          <!-- UNSUED TABS -------------------------------------------->
-          <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div>
         </div>
       </div>
     </div>
@@ -526,95 +707,3 @@ $precios = DBX::GetPrecios();
     <!-- scripts essenciales para funcionamiento pagina  -------------->
   </body>
 </html>
-
-<?php
-function type_switcher($id){
-  switch ($id) {
-    case 1:
-      return "Hotel";
-      break;
-
-    case 2:
-      return "Restaurante";
-      break;
-
-    case 3:
-      return "Experiencia";
-      break;
-
-    default:
-      // code...
-      break;
-  }
-}
-
-function type_switcher_modal($id){
-  switch ($id) {
-    case 1:
-      echo "
-        <option value='1' selected>Hotel</option>
-        <option value='2'>Restaurante</option>
-        <option value='3'>Experiencia</option>
-      ";
-      break;
-
-    case 2:
-      echo "
-        <option value='1'>Hotel</option>
-        <option value='2' selected>Restaurante</option>
-        <option value='3'>Experiencia</option>
-      ";
-      break;
-
-    case 3:
-      echo "
-        <option value='1'>Hotel</option>
-        <option value='2'>Restaurante</option>
-        <option value='3' selected>Experiencia</option>
-      ";
-      break;
-
-    default:
-      // code...
-      break;
-  }
-}
-
-function category_grabber($id){
-  $product_categories = DBX::GetProductCategories();
-  foreach ($product_categories as $category) {
-    if ($category[0] == $id) {
-      return ucfirst($category[1]);
-    }
-  }
-}
-
-function price_grabber($id){
-  $precios = DBX::GetPrecios();
-  foreach ($precios as $precio) {
-    if ($precio[0] == $id) {
-      return $precio[1];
-    }
-  }
-}
-
-function status_switcher($id){
-  switch ($id) {
-    case 0:
-      return "<span class='badge badge-warning'>Waiting Approval</span>";
-      break;
-
-    case 1:
-      return "<span class='badge badge-success'>Approved</span>";
-      break;
-
-    case 2:
-      return "<span class='badge badge-danger'>Disabled</span>";
-      break;
-
-    default:
-      // code...
-      break;
-  }
-}
-?>

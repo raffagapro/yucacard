@@ -1,5 +1,22 @@
 $(document).ready(function() {
 
+  //code for selecting tabs
+  $("#res_btn").click(function(){
+    window.location.replace("admin_panel.php?tab=res");
+  })
+
+  $("#user_btn").click(function(){
+    window.location.replace("admin_panel.php?tab=user");
+  })
+
+  $("#affi_btn").click(function(){
+    window.location.replace("admin_panel.php?tab=affi");
+  })
+
+  $("#products_btn").click(function(){
+    window.location.replace("admin_panel.php?tab=product");
+  })
+
 
   //function for subbmiting the form
   $(".modify_giftcard").click(function(event) {
@@ -13,24 +30,25 @@ $(document).ready(function() {
     //creates object to be pass to ajax
     var dataObj = {
       giftcard_id: card_id,
-      user_name: $('#user_name'+card_id).val().toLowerCase(),
-      user_lastName: $('#user_lastName'+card_id).val().toLowerCase(),
-      user_lastName2: $('#user_lastName2'+card_id).val().toLowerCase(),
-      user_phone: $('#user_phone'+card_id).val(),
-      user_email: $('#user_email'+card_id).val(),
-      gift_name: $('#gift_name'+card_id).val().toLowerCase(),
-      gift_lastName: $('#gift_lastName'+card_id).val().toLowerCase(),
-      gift_lastName2: $('#gift_lastName2'+card_id).val().toLowerCase(),
-      gift_email: $('#gift_email'+card_id).val(),
-      gift_note: $('#gift_note'+card_id).val(),
-      state_id: $('#state'+card_id).val(),
-      is_gift: $('#is_gift'+card_id).val(),
-      status: $('#status'+card_id).val(),
-      redeemed_product: $('#redeemed_product'+card_id).val(),
-      price: $('#price'+card_id).val()
+      user_name: $('#reservation_info'+card_id+' input[name="user_name"]').val().toLowerCase(),
+      user_lastName: $('#reservation_info'+card_id+' input[name="user_lastName"]').val().toLowerCase(),
+      user_lastName2: $('#reservation_info'+card_id+' input[name="user_lastName2"]').val().toLowerCase(),
+      user_phone: $('#reservation_info'+card_id+' input[name="user_phone"]').val(),
+      user_email: $('#reservation_info'+card_id+' input[name="user_email"]').val(),
+      gift_name: $('#reservation_info'+card_id+' input[name="gift_name"]').val().toLowerCase(),
+      gift_lastName: $('#reservation_info'+card_id+' input[name="gift_lastName"]').val().toLowerCase(),
+      gift_lastName2: $('#reservation_info'+card_id+' input[name="gift_lastName2"]').val().toLowerCase(),
+      gift_email: $('#reservation_info'+card_id+' input[name="gift_email"]').val(),
+      gift_note: $('#reservation_info'+card_id+' #gift_note'+card_id).val(),
+      state_id: $('#reservation_info'+card_id+' #state'+card_id+' option:selected').attr('value'),
+      is_gift: $('#reservation_info'+card_id+' #is_gift'+card_id+' option:selected').attr('value'),
+      status: $('#reservation_info'+card_id+' #status'+card_id+' option:selected').attr('value'),
+      redeemed_product: $('#reservation_info'+card_id+' #redeemed_product'+card_id+' option:selected').attr('value'),
+      price: $('#reservation_info'+card_id+' #price'+card_id+' option:selected').attr('value')
     };
 
     console.log(dataObj);
+
     //Validation
     if (dataObj.user_name == "") {
       sendErrorModal("Buyer Name missing!", card_id);
@@ -86,15 +104,15 @@ $(document).ready(function() {
             $("#errorMessage").empty().addClass('hidden');
             window.location = data.redirect;
           }
-          console.log("success");
+          //console.log("success");
         })
         .fail(function(e) {
-          console.log("error");
-          console.log(e.responseText);
+          //console.log("error");
+          //console.log(e.responseText);
         })
         .always(function(data) {
-          console.log(dataObj);
-          console.log(data);
+          //console.log(dataObj);
+          //console.log(data);
         });
       }
     }

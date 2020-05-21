@@ -28,7 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fileDestination = substr($fileDestination, 3);
         DBX::AddImg($product_id, $fileDestination);
         //redirect to new page
-        header("Location: ../dashboard.php?success");
+        if ($_SESSION['access'] == 0) {
+          header("Location: ../admin_panel.php?tab=affi&success");
+        }else {
+          header("Location: ../dashboard.php?success");
+        }
       }else {
         echo "file too big!!";
       }

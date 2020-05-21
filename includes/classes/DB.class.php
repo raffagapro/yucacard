@@ -92,6 +92,65 @@
       closeLink($stmt, $link);
     }
 
+    static function SearchUSERSByName($name){
+      $link = openlink();
+
+      $query = "SELECT * FROM users ";
+      $names = explode(" ", $name);
+      if (count($names) == 1) {
+        $name0 = $names[0];
+        $query .= "WHERE nombre  = ? OR apellido1 = ? OR apellido2 = ? ORDER BY nombre DESC";
+        $stmt = mysqli_stmt_init($link);
+        mysqli_stmt_prepare($stmt, $query);
+        mysqli_stmt_bind_param($stmt, "sss", $name0, $name0, $name0);
+      }elseif (count($names) == 2) {
+        $name0 = $names[0];
+        $name1 = $names[1];
+        $query .= "WHERE nombre  = ? AND apellido1 = ? ORDER BY nombre DESC";
+        $stmt = mysqli_stmt_init($link);
+        mysqli_stmt_prepare($stmt, $query);
+        mysqli_stmt_bind_param($stmt, "ss", $name0, $name1);
+      }elseif (count($names) == 3) {
+        $name0 = $names[0];
+        $name1 = $names[1];
+        $name2 = $names[2];
+        $query .= "WHERE nombre  = ? AND apellido1 = ? AND apellido2 = ? ORDER BY nombre DESC";
+        $stmt = mysqli_stmt_init($link);
+        mysqli_stmt_prepare($stmt, $query);
+        mysqli_stmt_bind_param($stmt, "sss", $name0, $name1, $name2);
+      }
+
+      mysqli_stmt_execute($stmt);
+      //grabing single result
+      $result = $stmt->get_result(); // get the mysqli result
+      $resultArray = $result->fetch_All();
+      if (empty($resultArray)) {
+        return false;
+      } else {
+        return $resultArray;
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function SearchUSERSByEmail($email){
+      $link = openlink();
+
+      $query = "SELECT * FROM users WHERE email = ? ORDER BY email DESC";
+      $stmt = mysqli_stmt_init($link);
+      mysqli_stmt_prepare($stmt, $query);
+      mysqli_stmt_bind_param($stmt, "s", $email);
+      mysqli_stmt_execute($stmt);
+      //grabing single result
+      $result = $stmt->get_result(); // get the mysqli result
+      $resultArray = $result->fetch_All();
+      if (empty($resultArray)) {
+        return false;
+      } else {
+        return $resultArray;
+      }
+      closeLink($stmt, $link);
+    }
+
     static function AddUSER($name, $name2, $name3, $email, $phone, $hashed_pw){
       $link = openlink();
 
@@ -107,6 +166,29 @@
         $result = $stmt->get_result(); // get the mysqli result
         return true;
       }
+      closeLink($stmt, $link);
+    }
+
+    static function SetUserPassword($user_id, $pw){
+      $link = openlink();
+
+      $hashed_pw = password_hash($pw, PASSWORD_DEFAULT);
+
+      //run modifying user table
+      $query = "UPDATE users SET password = ? where user_id = ? LIMIT 1";
+      $stmt = mysqli_stmt_init($link);
+      if (!mysqli_stmt_prepare($stmt, $query)) {
+        //return false if there was an error
+        return false;
+      } else {
+        mysqli_stmt_bind_param($stmt, "si", $hashed_pw, $user_id);
+        mysqli_stmt_execute($stmt);
+
+        //grabing single result
+        $result = $stmt->get_result(); // get the mysqli result
+        return true;
+      }
+
       closeLink($stmt, $link);
     }
 
@@ -292,7 +374,7 @@
         //checks to see if the city ID was passed
         if ($otro) {
           //change to 0 when implementing live server
-          $stupidaCiudad = 1;
+          $stupidaCiudad = 0;
           mysqli_stmt_bind_param($stmt, "issiis", $user_id, $job_title, $company_name, $state_id, $stupidaCiudad, $city_id);
         }else {
           mysqli_stmt_bind_param($stmt, "issii", $user_id, $job_title, $company_name, $state_id, $city_id);
@@ -346,6 +428,36 @@
       closeLink($stmt, $link);
     }
 
+    static function SetAffiStatus($aff_id, $status_id){
+      $link = openlink();
+
+      $query = "UPDATE afiliados SET aprovado = ? where affi_id = ? LIMIT 1";
+      $stmt = mysqli_stmt_init($link);
+      if (!mysqli_stmt_prepare($stmt, $query)) {
+        //return false if there was an error
+        return false;
+      }else {
+        mysqli_stmt_bind_param($stmt, "ii", $status_id, $aff_id);
+        mysqli_stmt_execute($stmt);
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function SetAffiCityState($aff_id, $state_id, $city_id){
+      $link = openlink();
+
+      $query = "UPDATE afiliados SET estado = ?, ciudad = ? where affi_id = ? LIMIT 1";
+      $stmt = mysqli_stmt_init($link);
+      if (!mysqli_stmt_prepare($stmt, $query)) {
+        //return false if there was an error
+        return false;
+      }else {
+        mysqli_stmt_bind_param($stmt, "iii", $state_id, $city_id, $aff_id);
+        mysqli_stmt_execute($stmt);
+      }
+      closeLink($stmt, $link);
+    }
+
     static function SetAccessByID($user_id, $access_level){
       $link = openlink();
 
@@ -394,6 +506,30 @@
         return false;
       }else {
         mysqli_stmt_bind_param($stmt, "i", $user_id);
+        mysqli_stmt_execute($stmt);
+        //grabing single result
+        $result = $stmt->get_result(); // get the mysqli result
+        $resultArray = $result->fetch_assoc();
+        if (empty($resultArray)) {
+          return false;
+        } else {
+          return $resultArray;
+        }
+
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function GetAffByID($affi_id){
+      $link = openlink();
+
+      $query = "SELECT * FROM afiliados WHERE affi_id = ? LIMIT 1";
+      $stmt = mysqli_stmt_init($link);
+      if (!mysqli_stmt_prepare($stmt, $query)) {
+        //return false if there was an error
+        return false;
+      }else {
+        mysqli_stmt_bind_param($stmt, "i", $affi_id);
         mysqli_stmt_execute($stmt);
         //grabing single result
         $result = $stmt->get_result(); // get the mysqli result
@@ -865,6 +1001,134 @@
           return $resultArray;
         }
 
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function GetAllGiftCardsByProductID($affi_id){
+      $link = openlink();
+
+      $query = "SELECT * FROM giftcard WHERE producto = ? ORDER BY fecha_creacion DESC";
+      $stmt = mysqli_stmt_init($link);
+      if (!mysqli_stmt_prepare($stmt, $query)) {
+        //return false if there was an error
+        return false;
+      }else {
+        mysqli_stmt_bind_param($stmt, "i", $affi_id);
+        mysqli_stmt_execute($stmt);
+        //grabing single result
+        $result = $stmt->get_result(); // get the mysqli result
+        $resultArray = $result->fetch_all();
+        if (empty($resultArray)) {
+          return false;
+        } else {
+          return $resultArray;
+        }
+
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function SearchGiftCardsByName($name){
+      $link = openlink();
+
+      $query = "SELECT * FROM giftcard ";
+      $names = explode(" ", $name);
+      if (count($names) == 1) {
+        $name0 = $names[0];
+        $query .= "WHERE nombre_comp  = ? OR apellido1_comp = ? OR apellido2_comp = ? OR nombre_gift = ? OR apellido1_gift = ? OR apellido2_gift = ? ORDER BY nombre_comp DESC";
+        $stmt = mysqli_stmt_init($link);
+        mysqli_stmt_prepare($stmt, $query);
+        mysqli_stmt_bind_param($stmt, "ssssss", $name0, $name0, $name0, $name0, $name0, $name0);
+      }elseif (count($names) == 2) {
+        $name0 = $names[0];
+        $name1 = $names[1];
+        $query .= "WHERE nombre_comp  = ? AND apellido1_comp = ? OR nombre_gift = ? AND apellido1_gift = ? ORDER BY nombre_comp DESC";
+        $stmt = mysqli_stmt_init($link);
+        mysqli_stmt_prepare($stmt, $query);
+        mysqli_stmt_bind_param($stmt, "ssss", $name0, $name1, $name0, $name1);
+      }elseif (count($names) == 3) {
+        $name0 = $names[0];
+        $name1 = $names[1];
+        $name2 = $names[2];
+        $query .= "WHERE nombre_comp  = ? AND apellido1_comp = ? AND apellido2_comp = ? OR nombre_gift = ? AND apellido1_gift = ? AND apellido2_gift = ? ORDER BY nombre_comp DESC";
+        $stmt = mysqli_stmt_init($link);
+        mysqli_stmt_prepare($stmt, $query);
+        mysqli_stmt_bind_param($stmt, "ssssss", $name0, $name1, $name2, $name0, $name1, $name2);
+      }
+
+      mysqli_stmt_execute($stmt);
+      //grabing single result
+      $result = $stmt->get_result(); // get the mysqli result
+      $resultArray = $result->fetch_All();
+      if (empty($resultArray)) {
+        return false;
+      } else {
+        return $resultArray;
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function SearchGiftCardsByResNum($res_num){
+      $link = openlink();
+
+      $query = "SELECT * FROM giftcard WHERE codigo  = ? ORDER BY codigo DESC";
+      $stmt = mysqli_stmt_init($link);
+      mysqli_stmt_prepare($stmt, $query);
+      mysqli_stmt_bind_param($stmt, "s", $res_num);
+      mysqli_stmt_execute($stmt);
+      //grabing single result
+      $result = $stmt->get_result(); // get the mysqli result
+      $resultArray = $result->fetch_All();
+      if (empty($resultArray)) {
+        return false;
+      } else {
+        return $resultArray;
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function SearchGiftCardsByEmail($email){
+      $link = openlink();
+
+      $query = "SELECT * FROM giftcard WHERE email_comp = ? OR email_gift = ? ORDER BY email_comp DESC";
+      $stmt = mysqli_stmt_init($link);
+      mysqli_stmt_prepare($stmt, $query);
+      mysqli_stmt_bind_param($stmt, "ss", $email, $email);
+      mysqli_stmt_execute($stmt);
+      //grabing single result
+      $result = $stmt->get_result(); // get the mysqli result
+      $resultArray = $result->fetch_All();
+      if (empty($resultArray)) {
+        return false;
+      } else {
+        return $resultArray;
+      }
+      closeLink($stmt, $link);
+    }
+
+    static function SearchGiftCardsByRecDate($rec_date){
+      $link = openlink();
+
+      $dates = explode(" - ", $rec_date);
+      $start = $dates[0];
+      $end = $dates[1];
+      //need to add this code to include the end date, since the format includes time and was ignoring end day of the query
+      $end = str_replace('-', '/', $end);
+      $end = date('Y-m-d',strtotime($end . "+1 days"));
+
+      $query = "SELECT * FROM giftcard WHERE fecha_creacion BETWEEN ? AND ?";
+      $stmt = mysqli_stmt_init($link);
+      mysqli_stmt_prepare($stmt, $query);
+      mysqli_stmt_bind_param($stmt, "ss", $start, $end);
+      mysqli_stmt_execute($stmt);
+      //grabing single result
+      $result = $stmt->get_result(); // get the mysqli result
+      $resultArray = $result->fetch_All();
+      if (empty($resultArray)) {
+        return false;
+      } else {
+        return $resultArray;
       }
       closeLink($stmt, $link);
     }
