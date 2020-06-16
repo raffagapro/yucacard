@@ -1,23 +1,4 @@
 $(document).ready(function() {
-
-  //code for selecting tabs
-  $("#res_btn").click(function(){
-    window.location.replace("admin_panel.php?tab=res");
-  })
-
-  $("#user_btn").click(function(){
-    window.location.replace("admin_panel.php?tab=user");
-  })
-
-  $("#affi_btn").click(function(){
-    window.location.replace("admin_panel.php?tab=affi");
-  })
-
-  $("#products_btn").click(function(){
-    window.location.replace("admin_panel.php?tab=product");
-  })
-
-
   //function for subbmiting the form
   $(".modify_giftcard").click(function(event) {
     //prevent de button to submit ormallly

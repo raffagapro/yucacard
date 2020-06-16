@@ -75,6 +75,12 @@ $(document).ready(function() {
       state: $("#affi_state"+affi_id+" option:selected").attr('value')
     };
 
+    //replaces the state value if the change in selector is from the searh filter
+    if ($(this).attr('id') == "search_state") {
+      dataObj.state = $("#search_state option:selected").attr('value');
+      affi_id = $(this).attr('id');
+    }
+
     //corre AJAX
     $.ajax({
       url: 'int/get_cities.int.php',
@@ -86,20 +92,36 @@ $(document).ready(function() {
     .done(function(data) {
       //checks to see if there was a VALIDATION error
       if (!data.cities) {
-        $("#affi_city"+affi_id).empty().append(
-          "<option value='z'>No Cities</option>"
-          );
+        if (affi_id == "search_state") {
+          //if the change comes from affilita state filter
+          $("#search_city_selector").empty().append(
+            "<option value='z'>No Cities</option>");
+        }else {
+          $("#affi_city"+affi_id).empty().append(
+            "<option value='z'>No Cities</option>");
+        }
       } else {
-        $("#affi_city"+affi_id).empty();
-        $("#affi_city"+affi_id).append("<option value='z'>Select City</option>");
-        for (var i = 0; i < data.cities.length; i++) {
-          //ignores city 0, no city
-          if (data.cities[i][0] != 0) {
-            $("#affi_city"+affi_id).append(
-              "<option value='"+ data.cities[i][0] +"' class='text-capitalize'>"+ data.cities[i][1] + "</option>"
-            );
+        if (affi_id == "search_state") {
+          //secon command for the selector in affi tab
+          $("#search_city_selector").empty();
+          $("#search_city_selector").append("<option value='z'>Select City</option>");
+          for (var i = 0; i < data.cities.length; i++) {
+            //ignores city 0, no city
+            if (data.cities[i][1] != "noCity") {
+              $("#search_city_selector").append("<option value='"+ data.cities[i][0] +"' class='text-capitalize'>"+ data.cities[i][1] + "</option>");
+            }
+          }
+        }else {
+          $("#affi_city"+affi_id).empty();
+          $("#affi_city"+affi_id).append("<option value='z'>Select City</option>");
+          for (var i = 0; i < data.cities.length; i++) {
+            //ignores city 0, no city
+            if (data.cities[i][1] != "noCity") {
+              $("#affi_city"+affi_id).append("<option value='"+ data.cities[i][0] +"' class='text-capitalize'>"+ data.cities[i][1] + "</option>");
+            }
           }
         }
+
       }
       //console.log("success");
     })
@@ -115,22 +137,16 @@ $(document).ready(function() {
 
   //function for closing other tabs
   $("#res_btn").click(function(){
-    $("#user_tab").removeClass('show');
-    $("#affi_tab").removeClass('show');
-    $("#product_tab").removeClass('show');
+    window.location.replace("admin_panel.php?tab=res");
   })
 
   //function for closing other tabs
   $("#user_btn").click(function(){
-    $("#reservations").removeClass('show');
-    $("#affi_tab").removeClass('show');
-    $("#product_tab").removeClass('show');
+    window.location.replace("admin_panel.php?tab=user");
   })
 
   //function for closing other tabs
   $("#affi_btn").click(function(){
-    $("#reservations").removeClass('show');
-    $("#user_tab").removeClass('show');
-    $("#product_tab").removeClass('show');
+    window.location.replace("admin_panel.php?tab=affi");
   })
 });

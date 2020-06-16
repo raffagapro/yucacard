@@ -6,13 +6,18 @@ Page::ForceLogin();
 $user = DBX::GetUSERbyID($_SESSION['user_id']);
 $product_categories = DBX::GetProductCategories();
 $states = DBX::GetStates();
-$affiliados = DBX::GetAllAffi();
 $prices = DBX::GetPrecios();
 
 
 // filtering includes
 include 'includes/admin_panel_res_filtering.inc.php';
 include 'includes/admin_panel_user_filtering.inc.php';
+include 'includes/admin_panel_affi_filtering.inc.php';
+/*
+The seach system works by using the above PHP includes to process the GET requets passed to the page.
+The search buttons DO NOT have any JS function associated tot hem, but they ar from passed to the same page with the GET get_class_methods
+There is a also a corresponding method from the DBX class use in the PHP files above
+*/
 
 
 
@@ -157,13 +162,6 @@ include 'includes/admin_panel_user_filtering.inc.php';
             $user_collapse = "collapse";
             $affi_collapse = "collapse show";
             $product_collapse = "collapse";
-            break;
-
-          case 'product':
-            $res_collapse = "collapse";
-            $user_collapse = "collapse";
-            $affi_collapse = "collapse";
-            $product_collapse = "collapse show";
             break;
         }
       }
@@ -657,14 +655,45 @@ include 'includes/admin_panel_user_filtering.inc.php';
             <div class='modal-body'>
               <form class='text-center' action='admin_panel.php' method='GET'>
 
-                <label for='search_name'>Name</label>
-                <input type='text' class='form-control text-capitalize' name='search_name' value=''>
-                <label for='search_reservation_number'>Reservation Number</label>
-                <input type='text' class='form-control text-capitalize' name='search_reservation_number' value=''>
-                <label for='search_email'>Email</label>
-                <input type='email' class='form-control' name='search_email' value=''>
-                <input type="hidden" name="search" value="on">
-                <input type="hidden" name="tab" value="res">
+                <label for='search_co_name'>Company Name</label>
+                <input type='text' class='form-control text-capitalize' name='search_co_name' value=''>
+                <label for='search_contact_name'>Contact Name</label>
+                <input type='text' class='form-control text-capitalize' name='search_contact_name' value=''>
+                <label for='search_product_name'>Product Name</label>
+                <input type='text' class='form-control text-capitalize' name='search_product_name' value=''>
+                <div class="row bot">
+                  <div class="col">
+                    <label for='search_state'>State</label>
+                    <select class='form-control text-capitalize affi_statez' id='search_state' name='search_state'>
+                      <option value="z">No State</option>';
+                      <?php
+                      foreach ($states as $state) {
+                        echo '<option value="'.$state[0].'">'.$state[1].'</option>';
+                      }
+                      ?>
+                    </select>
+                  </div>
+                  <div class="col">
+                    <label for='search_city'>City</label>
+                    <select class='form-control text-capitalize' id='search_city_selector' name='search_city_selector'>
+                      <?php
+                        //if the city was added manuelly display what was added manually and assigns value "z"
+                        $cities = DBX::GetCitiesByStateID($affiliado[1]);
+                        if (!$cities) {
+                          echo '<option value="z">No cities</option>';
+                        } else {
+                          foreach ($cities as $city) {
+                            echo '<option value="'.$city[0].'">'.$city[1].'</option>';
+                          }
+                        }
+
+
+                      ?>
+                    </select>
+                  </div>
+                </div>
+                <input type="hidden" name="search_affi" value="on">
+                <input type="hidden" name="tab" value="affi">
                 <div id='errorMessageSearch' class='alert alert-danger hidden text-center' role='alert'></div>
 
 

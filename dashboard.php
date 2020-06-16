@@ -123,12 +123,53 @@ $reservations = DBX::GetAllGiftCard();
       <!-- VERTICAL NAV BAR -------------------------------------------->
       <div class="col-2 dash_main_body navbar-dark bg-dark">
         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <a class="nav-link active" id="v-pills-products-tab" data-toggle="pill" href="#v-pills-products" role="tab" aria-controls="v-pills-products" aria-selected="true">Products</a>
-          <a class="nav-link" id="v-pills-reservations-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Reservations</a>
+          <?php
+            //we capture de "active" style of the collpase, and base on the arguent passed in GET it will activate the correct tab
+            $product_collapse = "nav-link active";
+            $res_collapse = "nav-link";
+            $add_product_collapse = "nav-link";
+            $product_collapse2 = "show active";
+            $res_collapse2 = "";
+            $add_product_collapse2 = "";
+            //if a tab was passed to get, passes the variables thru a swticher
+            if (isset($_GET['tab'])) {
+              switch ($_GET['tab']) {
+
+                case 'product':
+                  $product_collapse = "nav-link active";
+                  $res_collapse = "nav-link";
+                  $add_product_collapse = "nav-link";
+                  $product_collapse2 = "show active";
+                  $res_collapse2 = "";
+                  $add_product_collapse2 = "";
+                  break;
+
+                case 'res':
+                  $product_collapse = "nav-link";
+                  $res_collapse = "nav-link active";
+                  $add_product_collapse = "nav-link";
+                  $product_collapse2 = "";
+                  $res_collapse2 = "show active";
+                  $add_product_collapse2 = "";
+                  break;
+
+                case 'addP':
+                  $product_collapse = "nav-link";
+                  $res_collapse = "nav-link";
+                  $add_product_collapse = "nav-link active";
+                  $product_collapse2 = "";
+                  $res_collapse2 = "";
+                  $add_product_collapse2 = "show active";
+                  break;
+              }
+            }
+          ?>
+          <a class="<?php echo $product_collapse; ?>" id="v-pills-products-tab" data-toggle="pill" href="#v-pills-products" role="tab" aria-controls="v-pills-products" aria-selected="true">Products</a>
+          <a class="<?php echo $res_collapse; ?>" id="v-pills-reservations-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Reservations</a>
           <?php
           //checks to see if the Affiliate has been approved, and it gives them the ability to add products
           if ($aff['aprovado'] != 0) {
-            echo '<a class="nav-link" id="v-pills-addProduct-tab" data-toggle="pill" href="#v-pills-add_new_product" role="tab" aria-controls="v-pills-messages" aria-selected="false">Add New Product</a>';
+            echo '<a class="'.$add_product_collapse.'" id="v-pills-addProduct-tab" data-toggle="pill" href="#v-pills-add_new_product" role="tab" aria-controls="v-pills-messages" aria-selected="false">Add New Product</a>';
           }
           ?>
           <!--
@@ -143,7 +184,7 @@ $reservations = DBX::GetAllGiftCard();
         <div class="tab-content" id="v-pills-tabContent">
 
           <!-- PRODUCTS -------------------------------------------->
-          <div class="tab-pane fade show active" id="v-pills-products" role="tabpanel" aria-labelledby="v-pills-products-tab">
+          <div class="tab-pane fade <?php echo $product_collapse2; ?>" id="v-pills-products" role="tabpanel" aria-labelledby="v-pills-products-tab">
             <?php
               //print_r(DBX::GetPrecios());
               //-----codigo essencial para que la pagina ------//
@@ -434,9 +475,8 @@ $reservations = DBX::GetAllGiftCard();
             ?>
 
           </div>
-
           <!-- RESERVATIONS -------------------------------------------->
-          <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-reservations-tab">
+          <div class="tab-pane fade <?php echo $res_collapse2; ?>" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-reservations-tab">
 
             <!-- Menu de filtros------------------->
             <div class="text-right bg-dark admin_sub_nav_bar">
@@ -607,7 +647,7 @@ $reservations = DBX::GetAllGiftCard();
             </table>
           </div>
           <!-- ADD NEW PORODUCT -------------------------------------------->
-          <div class="tab-pane fade" id="v-pills-add_new_product" role="tabpanel" aria-labelledby="v-pills-addProduct-tab">
+          <div class="tab-pane fade <?php echo $add_product_collapse2; ?>" id="v-pills-add_new_product" role="tabpanel" aria-labelledby="v-pills-addProduct-tab">
             <div class="jumbotron jumbotron-fluid">
               <div class="container">
                 <h1 class="display-4">Add New Product</h1>
@@ -703,6 +743,7 @@ $reservations = DBX::GetAllGiftCard();
     <script src="js/modify_product.js" charset="utf-8"></script>
     <script src="js/modify_affi.js" charset="utf-8"></script>
     <script src="js/modify_affi_pw.js" charset="utf-8"></script>
+    <script src="js/dashboard.js" charset="utf-8"></script>
     <script src="js/functions.js" charset="utf-8"></script>
     <!-- scripts essenciales para funcionamiento pagina  -------------->
   </body>

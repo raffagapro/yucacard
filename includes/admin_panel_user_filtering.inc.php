@@ -4,20 +4,20 @@ if (isset($_GET['search_users'])) {
   $searchUSMail = "";
 
   if (isset($_GET['search_usr_name'])) {
-    $searchName = $_GET['search_usr_name'];
+    $searchUSName = $_GET['search_usr_name'];
   }
   if (isset($_GET['search_usr_email'])) {
-    $searchMail = $_GET['search_usr_email'];
+    $searchUSMail = $_GET['search_usr_email'];
   }
 
-  if ($searchName != "") {
+  if ($searchUSName != "") {
     $users = DBX::SearchUSERSByName($_GET['search_usr_name']);
     if (isset($_GET['sort'])) {
       if ($_GET['sort'] == 'asc') {
         $users = array_reverse($users);
       }
     }
-  }elseif ($searchMail != "") {
+  }elseif ($searchUSMail != "") {
     $users = DBX::SearchUSERSByEmail($_GET['search_usr_email']);
     if (isset($_GET['sort'])) {
       if ($_GET['sort'] == 'asc') {

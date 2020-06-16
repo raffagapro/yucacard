@@ -1,6 +1,4 @@
 $(document).ready(function() {
-
-
   //function for subbmiting the form
   $(".submitAffAdmin").click(function(event) {
     //prevent de button to submit ormallly
